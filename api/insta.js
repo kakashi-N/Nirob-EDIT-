@@ -1,11 +1,9 @@
-const express = require('express');
+// File: /api/insta.js
 const axios = require('axios');
-const app = express();
 
-app.use(express.json()); // to parse JSON body
-
-app.get('/dl', async (req, res) => {
+export default async function handler(req, res) {
   const { url } = req.query;
+
   if (!url) {
     return res.status(400).json({ status: 'error', message: 'Missing url parameter' });
   }
@@ -33,15 +31,10 @@ app.get('/dl', async (req, res) => {
       }
     );
 
-    // Send only necessary data if you want, e.g., video URL
-    res.json(response.data);
+    res.status(200).json(response.data);
 
   } catch (error) {
     console.error(error.message);
     res.status(500).json({ status: 'error', message: 'Failed to fetch Instagram reel' });
   }
-});
-
-app.listen(3000, () => {
-  console.log('API is running on port 3000');
-});
+}
