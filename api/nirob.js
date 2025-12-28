@@ -2,6 +2,7 @@ const axios = require('axios');
 
 module.exports = async (req, res) => {
   const { url } = req.query;
+
   if (!url) {
     return res.status(400).json({ status: 'error', message: 'Missing url parameter' });
   }
@@ -17,7 +18,7 @@ module.exports = async (req, res) => {
         accept: '*/*',
         'accept-language': 'en-US,en;q=0.9',
         'content-type': 'application/json',
-        cookie: 'additionalAuthParams={}; __Host-next-auth.csrf-token=36b098c5aafd64cc0c4d0a6baf471c045f5807680808038544fa4f69e7ea9ead%7Cd6cb98adca653eace0982e28d999889d52314e8626b8d2435a5979d94c2231e4; ...',
+        cookie: 'additionalAuthParams={}; __Host-next-auth.csrf-token=36b098c5aafd64cc0c4d0a6baf471c045f5807680808038544fa4f69e7ea9ead%7Cd6cb98adca653eace0982e28d999889d52314e8626b8d2435a5979d94c2231e4; ...', // keep your full cookie here
         referer: 'https://aiimageeditor.ai/',
         'sec-ch-ua': '"Chromium";v="107", "Not=A?Brand";v="24"',
         'sec-ch-ua-mobile': '?1',
@@ -29,7 +30,10 @@ module.exports = async (req, res) => {
       }
     });
 
-    res.status(200).json(response.data);
+    // Filter only images
+    const images = response.data.data?.filter(item => item.type === 'image')?.map(item => item.url) || [];
+
+    res.status(200).json({ status: 'success', images });
   } catch (error) {
     console.error(error);
     res.status(500).json({ status: 'error', message: 'Something went wrong', error: error.message });
