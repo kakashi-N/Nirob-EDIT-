@@ -1,9 +1,9 @@
-const express = require('express');
+// api/dl.js
 const axios = require('axios');
-const app = express();
 
-app.get('/dl', async (req, res) => {
+module.exports = async (req, res) => {
   const { url } = req.query;
+
   if (!url) {
     return res.status(400).json({ status: 'error', message: 'Missing url parameter' });
   }
@@ -11,7 +11,7 @@ app.get('/dl', async (req, res) => {
   try {
     const response = await axios.post(
       'https://reelsdownloader.socialplug.io/api/instagram_reels_downloader',
-      { url: url },
+      { url },
       {
         headers: {
           'authority': 'reelsdownloader.socialplug.io',
@@ -31,26 +31,9 @@ app.get('/dl', async (req, res) => {
       }
     );
 
-    // Filter only the URLs
-    // Usually the response has a field like `url` or `video_url`
-    // Adjust based on actual response structure
-    const data = response.data;
-    let urls = [];
-
-    if (data && data.download_url) {
-      // Single video URL
-      urls.push(data.download_url);
-    } else if (data && Array.isArray(data.urls)) {
-      // Multiple URLs
-      urls = data.urls.map(item => item.url || item.download_url).filter(Boolean);
-    }
-
-    res.json({ urls });
-
+    res.status(200).json(response.data);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ status: 'error', message: 'Failed to fetch URLs' });
+    console.error(error.response?.data || error.message);
+    res.status(500).json({ status: 'error', message: 'Failed to fetch data' });
   }
-});
-
-app.listen(3000, () => { console.log("API is running on port 3000"); });
+};
