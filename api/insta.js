@@ -5,7 +5,7 @@ module.exports = async (req, res) => {
   const { url } = req.query;
 
   if (!url) {
-    return res.status(400).json({ status: 'error', message: 'Missing url parameter' });
+    return res.status(400).send('Missing url parameter');
   }
 
   try {
@@ -31,9 +31,13 @@ module.exports = async (req, res) => {
       }
     );
 
-    res.status(200).json(response.data);
+    const videoURL = response.data.downloadURL;
+
+    // Send direct MP4 URL as plain text
+    res.status(200).send(videoURL);
+
   } catch (error) {
     console.error(error.response?.data || error.message);
-    res.status(500).json({ status: 'error', message: 'Failed to fetch data' });
+    res.status(500).send('Failed to fetch video');
   }
 };
